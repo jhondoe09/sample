@@ -28,8 +28,9 @@ function Home() {
 
     const handleViewEmail = (id) => (event) => {
         event.preventDefault();
-        setViewEmail(emails.filter(i => i.id == id));
-        console.log(viewEmail);
+        const newEmail = emails.filter(i => i.id == id);
+        console.log(newEmail);
+        setViewEmail(newEmail);
     }
 
     return (
@@ -77,37 +78,51 @@ function Home() {
                     <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div className="modal-body">
-                    {viewEmail.length > 0 ? viewEmail.map((v, i) => (
+                    {viewEmail.map((v, i) => (
                         <div key={i} className="col-md-12 row ">
-                            <div className="form-floating mb-2">
-                                <input type="email" className="form-control" id="floatingInput" placeholder="name@example.com"
-                                name="to"
-                                defaultValue={v.from}
-                                required
-                                ></input>
-                                <label htmlFor="floatingInput">From</label>
+                            <div className="mb-2">
+                                <div className="col-md-12">
+                                    <label htmlFor="floatingInput">From</label>
+                                </div>
+                                <div className="col-md-12">
+                                    <p>{v.from}</p>
+                                </div>
                             </div>
-                            <div className="form-floating mb-3">
-                                <input type="text" className="form-control" id="floatingPassword" placeholder="Subject"
-                                name="subject"
-                                required
-                                defaultValue={v.subject}
-                                ></input>
-                                <label htmlFor="floatingPassword">Subject</label>
+                            <div className="mb-3">
+                                <div className="col-md-12">
+                                    <label htmlFor="floatingPassword">Subject:</label>
+                                </div>
+                                <div className="col-md-12">
+                                    <p>{v.subject}</p>
+                                </div>
                             </div>
-                            <div className="form-floating mb-3">
-                                <textarea className="form-control" placeholder="Leave a comment here" id="floatingTextarea2" style={{height: 300}}
-                                name="message"
-                                defaultValue={v.body ? v.body : v.snippet}
-                                required></textarea>
+                            <div className="mb-3">
+                                <div className="col-md-12">
+                                    <label htmlFor="floatingPassword">Body:</label>
+                                </div>
+                                <div className="col-md-12">
+                                    <p className="text-break">{v.body ? v.body : v.snippet}</p>
+                                </div>
                             </div>
-                            <div className="form-floating mb-3">
-                                <input type="file" className="form-control" id="floatingPassword" placeholder="Attachment"
-                                name="attachments" 
-                                multiple></input>
+                            <div className="mb-3">
+                                {v.attachments.length > 0 ? 
+                                    v.attachments.map((a, i) => (  
+                                        <ul className="list-group list-group-flush">
+                                            <div className="col-md-12 row">
+                                            <a 
+                                            href={`/download/${a.filename}`} 
+                                            download={a.filename} 
+                                            target="_blank" 
+                                            rel="noopener noreferrer"
+                                            ><li className="list-group-item col-md-12">{a.filename}</li></a>
+                                            </div>
+                                        </ul>
+                                    ))
+                                : <p>No attachments</p>}
+                               
                             </div>
                         </div>
-                    )): <p>No data</p>}
+                    ))}
                 </div>
                 <div className="modal-footer">
                     <button type="button" className="btn btn-secondary" data-bs-dismiss="modal">Close</button>
