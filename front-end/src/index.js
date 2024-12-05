@@ -10,6 +10,7 @@ import SMS from "./components/views/SMS/Sms";
 import SmsHome from "./components/views/SMS/SmsHome";
 import Chat from "./components/views/Chat/Chat";
 import ChatHome from "./components/views/Chat/ChatHome";
+import Call from "./components/views/Call/Call";
 import NotFound from "./components/views/NotFound/NotFound";
 import RichTextEditor from "./components/views/TextEditor/TextEditor";
 import reportWebVitals from "./reportWebVitals";
@@ -26,6 +27,7 @@ root.render(
         <Route path="sms" element={<SMS />} />
         <Route path="chatHome" element={<ChatHome />} />
         <Route path="chat" element={<Chat />} />
+        <Route path="call" element={<Call />} />
         <Route path="text" element={<RichTextEditor />} />
         <Route path="*" element={<NotFound />} />
       </Route>

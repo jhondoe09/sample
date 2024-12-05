@@ -19,7 +19,7 @@ const Sidebar = () => {
           <Link to="/chatHome">Chat</Link>
         </li>
         <li>
-          <Link to="*">Call</Link>
+          <Link to="/call">Call</Link>
         </li>
       </ul>
     </nav>
