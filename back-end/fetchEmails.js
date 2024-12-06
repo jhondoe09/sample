@@ -63,7 +63,8 @@ async function fetchEmails() {
             subject: getHeader(messageData.data.payload.headers, "Subject"),
             from: getHeader(messageData.data.payload.headers, "From"),
             snippet: messageData.data.snippet,
-            body: extractBody(messageData.data.payload)
+            body: extractBody(messageData.data.payload),
+            attachments: await extractAttachments(gmail, messageData.data),
         };
 
         emailDetails.push(email);
@@ -95,6 +96,37 @@ function extractBody(payload) {
     }
 
     return body;
+}
+
+// Helper function to extract attachments
+async function extractAttachments(gmail, messageData) {
+    const attachments = [];
+
+    // Check if there are parts in the payload
+    if (messageData.payload.parts) {
+        for (const part of messageData.payload.parts) {
+            if (part.filename && part.body && part.body.attachmentId) {
+                // Fetch the attachment data using the attachmentId
+                const attachment = await gmail.users.messages.attachments.get({
+                    userId: "me",
+                    messageId: messageData.id,
+                    id: part.body.attachmentId,
+                });
+
+                // Decode the Base64 data
+                const decodedData = decodeBase64Url(attachment.data.data);
+
+                attachments.push({
+                    filename: part.filename,
+                    mimeType: part.mimeType,
+                    size: part.body.size,
+                    data: decodedData, // This is the raw attachment data
+                });
+            }
+        }
+    }
+
+    return attachments;
 }
 
 // Function to decode Base64 URL
