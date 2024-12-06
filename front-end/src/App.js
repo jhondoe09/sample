@@ -8,7 +8,7 @@ const App = () => {
     <div className="app-container">
       {/* Sidebar on the left */}
       <Sidebar />
-      
+
       {/* Main content area */}
       <div className="main-content">
         <Outlet />

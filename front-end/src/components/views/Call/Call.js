@@ -22,7 +22,8 @@ const Call = () => {
             const response = await axios.post("http://localhost:5000/make-call", {
                 toPhoneNumber: phoneNumber,
             });
-            alert("Call initiated: " + response.data.callSid);
+            console.log(response.data);
+            alert(response.data);
         } catch (error) {
             alert("Error: " + error.message);
         } finally {

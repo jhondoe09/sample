@@ -14,13 +14,16 @@ import Call from "./components/views/Call/Call";
 import NotFound from "./components/views/NotFound/NotFound";
 import RichTextEditor from "./components/views/TextEditor/TextEditor";
 import reportWebVitals from "./reportWebVitals";
+import Login from "./components/Login/Login";
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(
   <BrowserRouter>
     <Routes>
+      <Route path="/" element={<Login />} />
+
       <Route path="/" element={<App />}>
-        <Route index element={<Home />} />
+        <Route path="home" element={<Home />} />
         <Route path="emailHome" element={<EmailHome />} />
         <Route path="email" element={<Email />} />
         <Route path="smsHome" element={<SmsHome />} />
