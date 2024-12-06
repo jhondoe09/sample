@@ -5,17 +5,18 @@ import axios from "axios";
 const socket = io("http://localhost:5000", {
   withCredentials: true, // Include credentials like cookies
 });
-
+const user_token = localStorage.getItem('token');
 const Chat = () => {
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState("");
   const [file, setFile] = useState(null);
   const [userId, setUserId] = useState("");
+
   // Listen for incoming messages
   useState(() => {
     socket.on("receiveMessage", (message) => {
       console.log(message);
-      setUserId(message.sender);
+      setUserId(message.user_name);
       setMessages((prevMessages) => [...prevMessages, message]);
     });
 
@@ -41,6 +42,8 @@ const Chat = () => {
     const message = {
       text: input,
       attachment: fileUrl,
+      user_token: localStorage.getItem('token'),
+      user_name: localStorage.getItem('user_name')
     };
 
     socket.emit("sendMessage", message);
@@ -55,7 +58,7 @@ const Chat = () => {
   return (
     <div className="container my-5">
       <div className="position-relative p-5 text-muted bg-body border border-dashed rounded-5">
-        <h1>Chat with {userId}</h1>
+        <h1>Chat with {localStorage.getItem('ChatUser') ?? userId}</h1>
         <div
           style={{
             height: "500px",
@@ -69,7 +72,7 @@ const Chat = () => {
             <div
               key={index}
               style={{
-                textAlign: msg.sender === userId ? "right" : "left",
+                textAlign: msg.sender === user_token ? "right" : "left",
                 marginBottom: "15px",
               }}
             >
@@ -78,7 +81,7 @@ const Chat = () => {
                   display: "inline-block",
                   padding: "10px",
                   borderRadius: "10px",
-                  backgroundColor: msg.sender === userId ? "#d1f7c4" : "#e4e4e4",
+                  backgroundColor: msg.sender === user_token ? "#d1f7c4" : "#e4e4e4",
                 }}
               >
                 <p>{msg.text}</p>
@@ -118,7 +121,7 @@ const Chat = () => {
                 )}
               </div>
               <small style={{ display: "block", color: "#888" }}>
-                {msg.sender === userId ? "You" : msg.sender}
+                {msg.sender === user_token ? "You" : localStorage.getItem('ChatUser') ?? msg.user}
               </small>
             </div>
           ))}

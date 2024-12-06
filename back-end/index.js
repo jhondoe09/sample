@@ -17,7 +17,8 @@ app.use(cors());
 app.use(bodyParser.json());
 const server = http.createServer(app);
 // const io = new Server(server);
-
+const bcrypt = require("bcryptjs");
+const jwt = require("jsonwebtoken");
 
 // Storage for uploaded files
 const storage = multer.diskStorage({
@@ -149,7 +150,7 @@ const yourPhoneNumber = '+63 992 572 3706'; // Replace with your phone number
 app.post('/make-call', (req, res) => {
     client.calls
         .create({
-            url: 'https://82dc-58-71-18-187.ngrok-free.app/handle-call', // URL for TwiML instructions
+            url: 'https://6433-58-71-18-187.ngrok-free.app/handle-call', // URL for TwiML instructions
             to: yourPhoneNumber, // Your personal number to call
             from: twilioNumber,  // Twilio number to call from
         })
@@ -178,7 +179,7 @@ const clients = new Set();
 
 const io = new Server(server, {
     cors: {
-        origin: "http://localhost:3001", // Your frontend's URL
+        origin: "http://localhost:3000", // Your frontend's URL
         methods: ["GET", "POST"],       // Allowed methods
         credentials: true,              // Allow cookies or auth headers
     },
@@ -198,7 +199,8 @@ io.on("connection", (socket) => {
 
     // Listen for messages and attach sender info
     socket.on("sendMessage", (message) => {
-        const senderId = users[socket.id];
+        console.log(message);
+        const senderId = message.user_token;
         const messageWithSender = { ...message, sender: senderId };
         io.emit("receiveMessage", messageWithSender); // Broadcast message
     });
@@ -211,6 +213,68 @@ io.on("connection", (socket) => {
     });
 });
 
+// Dummy User Data
+const users2 = [
+    {
+        id: 1,
+        username: "testuser@gmail.com",
+        password: bcrypt.hashSync("1", 10), // bcrypt hash for "password123"
+    }, {
+        id: 2,
+        username: "testuser2@gmail.com",
+        password: bcrypt.hashSync("1", 10), // bcrypt hash for "password123"
+    },
+];
 
+// Secret key for JWT
+const SECRET_KEY = process.env.JWT_SECRET;
 
+// Login Route
+app.post("/login", (req, res) => {
+    const { username, password } = req.body;
+
+    // Find user by username
+    const user = users2.find((u) => u.username === username);
+    if (!user) {
+        return res.status(401).json({ message: "Invalid username or password" });
+    }
+
+    // Compare passwords
+    const isPasswordValid = bcrypt.compareSync(password, user.password);
+    if (!isPasswordValid) {
+        return res.status(401).json({ message: "Invalid username or password" });
+    }
+
+    // Generate JWT
+    const token = jwt.sign({ id: user.id, username: user.username }, SECRET_KEY, {
+        expiresIn: "1h",
+    });
+
+    res.json({ message: "Login successful", token });
+});
+
+// Protected Route
+app.get("/dashboard", (req, res) => {
+    const token = req.headers["authorization"];
+    if (!token) {
+        return res.status(401).json({ message: "No token provided" });
+    }
+
+    try {
+        const decoded = jwt.verify(token, SECRET_KEY);
+        console.log(decoded);
+        res.json({ message: `Welcome ${decoded.username}!`, username: decoded.username });
+    } catch (err) {
+        res.status(401).json({ message: "Invalid token" });
+    }
+});
+
+app.get("/getUsers", (req, res) => {
+
+    try {
+        res.json({ message: `Fetching users success`, users: users2 });
+    } catch (err) {
+        res.status(401).json({ message: "ERror occured" });
+    }
+});
 
